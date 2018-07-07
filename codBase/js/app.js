@@ -5,6 +5,8 @@ var numaux1 = 0;
 var numaux2 = 0;
 var numresp = 0;
 var segoper =  true;
+var final = true;
+var aux= 0;
 
 //Eventos on click
 document.getElementById(0).onmousedown = function () {presion(this.id)};
@@ -25,18 +27,19 @@ document.getElementById("dividido").onmousedown = function () {operacion(this.id
 document.getElementById("menos").onmousedown = function () {operacion(this.id)};
 document.getElementById("mas").onmousedown = function () {operacion(this.id)};
 document.getElementById("igual").onmousedown = function () {fin(this.id)};
+document.getElementById("raiz").onmousedown = function () {resize(this.id)};
 
 //funcion de presionar tecla
 
 function presion (id){
 
   if (id == "punto" && rep) { //presionar punto
+    aux = 1;
     acum('.');
     rep = false;
   }
   else if (id == "on") { //presionar tecla on
-    document.getElementById("display").innerHTML = 0;
-    rep = true;
+    on();
   }
   else if (id != "punto" && id != "on" && id != "sign" && id != "raiz" && id != "dividido" && id != "por" && id != "menos" && id != "igual" && id != "mas") { // presionar tecla numerica
     if (document.getElementById("display").innerHTML == '0') {// comprobación de cero en pantalla
@@ -46,44 +49,49 @@ function presion (id){
     acum(pres);
   }
   else if (id == "sign"){ //presionar tecla cambio de signo
-    var num = document.getElementById("display").innerHTML;
-    num = num * -1;
-    document.getElementById("display").innerHTML = num;
+    if (segoper){
+      num = num * -1;
+      document.getElementById("display").innerHTML = num;
+    }
+    else {
+      numaux1 = numaux1 * -1;
+      document.getElementById("display").innerHTML = numaux1;
+    }
   }
   else if (id != "punto") { //presionar tecla de operacion aritmetica
     operacion();
-    if (!segoper) {
+    if (!segoper && final) {
       oper2 (oper, numaux1, numaux2);
     }
   }
 
   resize(id);
-
 }
 
 function acum (x){ //encadenar caracteres en pantalla
   var y = document.getElementById("display").innerHTML;
   num = y+x;
-  console.log(num);
-  if (document.getElementById("display").innerHTML.length < 8) {
+  if (document.getElementById("display").innerHTML.length < 8+aux) {
     document.getElementById("display").innerHTML = y+x;
   }
 }
 
 function operacion (id){ //guardar el numero en pantalla en una variable
   rep = true;
+  aux = 0;
   if (segoper){
     numaux1 = num;
   }
   else {
     numaux2 = num;
-    oper2 (oper, numaux1, numaux2);
+    if (final) {
+      oper2 (oper, numaux1, numaux2);
+    }
   }
   num = 0;
-  document.getElementById("display").innerHTML = 0;
+  document.getElementById("display").innerHTML = "";
   oper=id;
   segoper = false;
-
   resize(id);
 
 }
@@ -105,22 +113,30 @@ function oper2 (oper, num1, num2){// operaciones artimeticas
       break;
   }
   numaux1 = numresp;
-  //numaux2 = 0;
 }
 
-function fin (id){
+function fin (id){//operacion igual
   numaux2 = num;
   oper2 (oper, numaux1, numaux2)
-  var presentacion = String(numresp);
-  console.log(presentacion);
+  var presentacion = String(numaux1);
   document.getElementById("display").innerHTML = "";
-  document.getElementById("display").innerHTML = presentacion.substring(0,7);
-  //num = 0;
-  segoper = true;
+  document.getElementById("display").innerHTML = presentacion.substring(0,8);
+  final = false;
   resize(id);
 }
 
-function resize (id){
+function on (){//boton ONC
+  num=0;
+  numaux1 = 0;
+  numaux2 = 0;
+  numresp=0;
+  document.getElementById("display").innerHTML = 0;
+  rep = true;
+  segoper = true;
+  aux=0;
+}
+
+function resize (id){//animacion de teclas
   var tanH = document.getElementById(id);
   tanH.style.transform='scale(0.9)';
   setTimeout(function(){
